@@ -8,7 +8,7 @@ import redis
 import requests
 import json
 
-from core.config import REDIS_CONFIG, IP_CONFIG
+from core.config import REDIS_CONFIG, IP_CONFIG, GALAXY_CONFIG
 
 
 class BaseSpider(object):
@@ -26,7 +26,7 @@ class BaseSpider(object):
         self.logger = get_logger(self.market_code)
 
     def get_coinpairs(self):
-        r = requests.post("https://galaxy-backup.sandyvip.com/api/coinpair/", timeout=10, data={
+        r = requests.post(GALAXY_CONFIG['host'] + "/api/coinpair/", timeout=10, data={
             "market_code": self.market_code
         })
         data = json.loads(r.content)["data"]["list"]

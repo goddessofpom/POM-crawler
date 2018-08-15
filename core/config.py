@@ -25,3 +25,7 @@ DATA_ERROR_CONFIG = {
         "code": [1053, "IP_BAN"]
     }
 }
+
+GALAXY_CONFIG = {
+    "host":"https://galaxy-backup.sandyvip.com/api/coinpair/"
+}
