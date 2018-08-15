@@ -1,0 +1,73 @@
+*.pyc
+.settings
+.project
+.pydevproject
+galaxy/settings.py
+trace.log
+./static/
+galaxy/media/
+trace.log
+galaxy/wsgi.py
+media/charting_library-master/
+
+### Django ###
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+
+### other IDE ###
+.idea/
+.project
+.pydevproject
+
+### vim swap file ###
+*.swp
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+staticfiles/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+*.pot
+
+# Sphinx documentation
+docs/_build/
+
+settings_dev.py
+settings_develop.py
