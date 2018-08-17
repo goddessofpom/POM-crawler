@@ -36,6 +36,7 @@ class BaseSpider(object):
         return coinpairs
 
     async def _fetch(self, semaphore, url, symbol, timeout=10, ssl=None, headers=None, proxy=None):
+
         if self.ip_controller:
             local_addr = self.ip_controller.get_ip()
             if local_addr:
@@ -52,14 +53,16 @@ class BaseSpider(object):
         else:
             session = aiohttp.ClientSession()
             local_addr = None
+
         async with semaphore:
-            async with session:
+            async with session as session:
                 try:
                     start_request_time = time.time()
                     async with session.get(url, timeout=timeout, ssl=ssl, proxy=proxy) as response:
                         text = await response.text()
                         if response.status == 200:
                             parse_data = json.loads(text)
+                            self.logger.info("success:%s" % self.fetch_count)
 
                             is_correct = self.exception_handler.is_correct(self.market_code, parse_data)
 
@@ -78,6 +81,7 @@ class BaseSpider(object):
                                     self.logger.error("unexcept error while saving data")
                                     print(traceback.print_exc())
                                     self.loop.stop()
+                                
                                 self.logger.info("success with url {}".format(url), text[:100])
 
                                 try:
@@ -86,12 +90,15 @@ class BaseSpider(object):
                                     self.logger.error("unexcept error while send data to celery")
                                     print(traceback.print_exc())
                                     self.loop.stop()
+                                    
+                                
                             else:
                                 self.logger.warning("get wrong data, status:%s" % is_correct)
                                 self.exception_handler.handle_exception(
                                     is_correct, ip_controller=self.ip_controller, ip=local_addr,
                                     spider_logger=self.logger
                                 )
+
                         elif response.status == 400:
                             self.logger.warning("url:%s, coinpair dose not exist" % url)
                         else:
@@ -101,7 +108,7 @@ class BaseSpider(object):
                         end_request_time = time.time()
                         response_time = end_request_time - start_request_time
 
-                        self.limiter.limit_per_request(url, response_time)
+                        # self.limiter.limit_per_request(url, response_time)
 
                         if self.fetch_count >= IP_CONFIG['reuse_ip_count'] and self.ip_controller:
                             self.ip_controller.reuse_ip()
@@ -128,7 +135,7 @@ class BaseSpider(object):
         self.loop.stop()
 
     def save(self, redis_key, data):
-        self.logger.error("_save method must override")
+        self.logger.error("save method must override")
         self.loop.stop()
 
     def broadcast_data(self, data):
@@ -138,4 +145,4 @@ class BaseSpider(object):
 
     def run(self):
         self.loop.run_until_complete(asyncio.ensure_future(asyncio.wait(self.task_url)))
-        self.loop.run_forever()
+        # self.loop.run_forever()

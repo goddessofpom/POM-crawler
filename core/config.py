@@ -2,10 +2,10 @@
 LIMITER_CONFIG = {
     'Binance':{
         'rate': {
-            'ETH/BTC': 0.5,
-            'default': 0.5
+            'ETH/BTC': 0,
+            'default': 0
         },
-        'max_concurrent': 10
+        'max_concurrent': 200
     }
 }
 

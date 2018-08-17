@@ -1,6 +1,5 @@
 from celery_service.big_deals import save_big_deals
 from core.base_spider import BaseSpider
-import redisco
 
 
 class BinanceDepthSpider(BaseSpider):
