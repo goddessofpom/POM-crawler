@@ -1,5 +1,6 @@
 from celery.task import Task
 
+
 BROKER_URL = "redis://127.0.0.1:6379/1"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/1"
 CELERY_TIMEZONE = 'Asia/Shanghai'
@@ -48,6 +49,7 @@ class MyRouter(object):
 CELERY_ROUTES = (MyRouter(), )
 
 class MyTask(Task):
+
     def on_success(self, retval, task_id, args, kwargs):
         print('task done: {0}'.format(retval))
         return super(MyTask, self).on_success(retval, task_id, args, kwargs)

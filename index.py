@@ -1,14 +1,14 @@
 from core.factory import AsyncioSpiderFactory
-from component.cleaners import BinanceCleaner
+from component.cleaners import BinanceDepthCleaner
 from component.limiters import BinanceLimiter
 from component.ip_controllers import BinanceController
-from component.exception_handler import BinanceExceptionHandler
+from component.exception_handler import BinanceDepthExceptionHandler
 
 
 if __name__ == "__main__":
     limiter = BinanceLimiter("Binance")
-    cleaner = BinanceCleaner()
-    exception_handler = BinanceExceptionHandler()
+    cleaner = BinanceDepthCleaner()
+    exception_handler = BinanceDepthExceptionHandler()
     spider = AsyncioSpiderFactory.make_spider(
         "BinanceDepthSpider", "Binance", limiter=limiter, cleaner=cleaner,
         exception_handler=exception_handler

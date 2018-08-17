@@ -2,15 +2,26 @@
 LIMITER_CONFIG = {
     'Binance':{
         'rate': {
-            'ETH/BTC': 1,
-            'default': 1
+            'ETH/BTC': 0.5,
+            'default': 0.5
         },
-        'max_concurrent': 20
+        'max_concurrent': 10
     }
 }
 
 REDIS_CONFIG = {
-    "url": "redis://127.0.0.1:6379/1"
+    "host": "redis://127.0.0.1:6379",
+    "db": "1"
+}
+
+MYSQL_CONFIG = {
+    "min_size": 50,
+    "host": "localhost",
+    "user": "root",
+    "passwd": "agile",
+    "db": "data_service",
+    "port": 3308,
+    "charset": "utf8"
 }
 
 IP_CONFIG = {
@@ -27,5 +38,5 @@ DATA_ERROR_CONFIG = {
 }
 
 GALAXY_CONFIG = {
-    "host":"https://galaxy-backup.sandyvip.com/api/coinpair/"
+    "host":"https://galaxy-backup.sandyvip.com"
 }

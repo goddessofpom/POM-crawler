@@ -14,9 +14,9 @@ class BaseExceptionHandler(object):
         raise NotImplementedError("this method must override")
 
 
-class BinanceExceptionHandler(BaseExceptionHandler):
+class BinanceDepthExceptionHandler(BaseExceptionHandler):
     def __init__(self, *args, **kwargs):
-        super(BinanceExceptionHandler, self).__init__(*args, **kwargs)
+        super(BinanceDepthExceptionHandler, self).__init__(*args, **kwargs)
 
     def is_correct(self, market_code, data):
         error_dict = DATA_ERROR_CONFIG[market_code]
@@ -33,3 +33,17 @@ class BinanceExceptionHandler(BaseExceptionHandler):
             spider_logger.warning("%s is banned" % ip)
             timestamp = time.time()
             ip_controller.disable_ip(ip, timestamp)
+
+
+class BinanceTradeExceptionHandler(BaseExceptionHandler):
+    def __init__(self, *args, **kwargs):
+        super(BinanceTradeExceptionHandler, self).__init__(*args, **kwargs)
+
+    def is_correct(self, market_code, data):
+        if isinstance(data, list):
+            return True
+        else:
+            return False
+
+    def handle_exception(self, spider_logger, except_type):
+        spider_logger.error("error !!")

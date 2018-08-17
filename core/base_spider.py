@@ -21,7 +21,9 @@ class BaseSpider(object):
         self.ip_controller = ip_controller
         self.exception_handler = exception_handler
         self.market_code = market_code
-        self.redis = redis.StrictRedis(connection_pool=redis.ConnectionPool.from_url(REDIS_CONFIG['url']))
+        self.redis = redis.StrictRedis(connection_pool=redis.ConnectionPool.from_url(
+            REDIS_CONFIG['host'] + "/" + REDIS_CONFIG['db']
+        ))
         self.fetch_count = 0
         self.logger = get_logger(self.market_code)
 
@@ -33,7 +35,7 @@ class BaseSpider(object):
         coinpairs = [i["pair_name"] for i in data]
         return coinpairs
 
-    async def _fetch(self, semaphore, url, timeout=10, ssl=None, headers=None, proxy=None):
+    async def _fetch(self, semaphore, url, symbol, timeout=10, ssl=None, headers=None, proxy=None):
         if self.ip_controller:
             local_addr = self.ip_controller.get_ip()
             if local_addr:
@@ -64,7 +66,7 @@ class BaseSpider(object):
                             if is_correct is True:
 
                                 try:
-                                    data = self.cleaner.clean_data(parse_data)
+                                    data = self.cleaner.clean_data(self.market_code, symbol, parse_data)
                                 except:
                                     self.logger.error("unexcept except while clean data, DATA:%s" % parse_data)
                                     return False
@@ -90,9 +92,11 @@ class BaseSpider(object):
                                     is_correct, ip_controller=self.ip_controller, ip=local_addr,
                                     spider_logger=self.logger
                                 )
+                        elif response.status == 400:
+                            self.logger.warning("url:%s, coinpair dose not exist" % url)
                         else:
                             # print("faild with url {}".format(url), text)
-                            self.logger.error("fetch url:%s failed,status_code:%s" % url, response.status)
+                            self.logger.error("fetch url:%s failed,status_code:%s" % (url, response.status))
 
                         end_request_time = time.time()
                         response_time = end_request_time - start_request_time
@@ -106,7 +110,7 @@ class BaseSpider(object):
                             self.fetch_count = self.fetch_count + 1
                         return text
                 except asyncio.TimeoutError:
-                    self.logger.error("asyncio timeout!")
+                    self.logger.error("asyncio timeout! url:%s" % (url,))
                     return None
                 except Exception as e:
                     self.logger.error("unexcept error while fetching url!")
@@ -117,7 +121,7 @@ class BaseSpider(object):
     def add_task(self, tasks):
         semaphore = asyncio.Semaphore(self.limiter.get_semaphore_concurrent())
         for task in tasks:
-            self.task_url.append(self._fetch(semaphore,task))
+            self.task_url.append(self._fetch(semaphore,task[0], task[1]))
 
     def get_redis_key(self,market_code, url):
         self.logger.error("get_redis_key method must override")
