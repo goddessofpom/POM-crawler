@@ -14,20 +14,18 @@ class BaseLimiter(object):
         return self.max_concurrent
 
     # 对每个请求的时间进行限制
-    def limit_per_request(self, url, response_time):
+    def limit_per_request(self, symbol, response_time):
         raise NotImplementedError("this method must override")
 
 
-class BinanceLimiter(BaseLimiter):
+class StandardLimiter(BaseLimiter):
     def __init__(self, *args, **kwargs):
-        super(BinanceLimiter, self).__init__(*args, **kwargs)
+        super(StandardLimiter, self).__init__(*args, **kwargs)
 
-    def limit_per_request(self, url, response_time):
-        coinpair = url.split("=")[-1]
+    def limit_per_request(self, symbol, response_time):
         try:
-            limit_rate = LIMITER_CONFIG[self.market_code]['rate'][coinpair]
+            limit_rate = LIMITER_CONFIG[self.market_code]['rate'][symbol]
         except KeyError:
             limit_rate = LIMITER_CONFIG[self.market_code]['rate']['default']
 
-        if limit_rate > response_time:
-            time.sleep(limit_rate - response_time)
+        # time.sleep(limit_rate)

@@ -7,8 +7,10 @@ CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_TASK_RESULT_EXPIRES = 1200 # celery任务执行结果的超时时间
 CELERYD_CONCURRENCY = 50 # celery worker的并发数
 CELERYD_PREFETCH_MULTIPLIER = 4 # celery worker 每次去取任务的数量
-CELERYD_MAX_TASKS_PER_CHILD = 40 # 每个worker执行了多少任务就会死掉
+CELERYD_MAX_TASKS_PER_CHILD = 1000 # 每个worker执行了多少任务就会死掉
 CELERY_DEFAULT_QUEUE = "default_plugin" # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面
+CELERY_TASK_RESULT_EXPIRES = 30
+
 
 CELERY_IMPORTS = (
     'celery_service.big_deals'

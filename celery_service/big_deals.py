@@ -11,15 +11,7 @@ import traceback
 
 
 redis_con = None
-mysql_pool = None
-@celeryd_init.connect
-def configure_workers(sender=None, conf=None, **kwargs):
-    global mysql_pool
-    mysql_pool = PooledDB(
-        pymysql, MYSQL_CONFIG['min_size'], host=MYSQL_CONFIG['host'],
-        user=MYSQL_CONFIG['user'], passwd=MYSQL_CONFIG['passwd'], db=MYSQL_CONFIG['db'],
-        port=MYSQL_CONFIG['port'], charset=MYSQL_CONFIG['charset']
-    )
+conn = None
 
 
 @worker_process_init.connect
@@ -28,32 +20,38 @@ def init_worker(**kwargs):
     redis_con = redis.StrictRedis(connection_pool=redis.ConnectionPool.from_url(
                     REDIS_CONFIG['host'] + "/" + REDIS_CONFIG['db']
                 ))
-"""
+    global conn
+    conn = pymysql.connect(port=MYSQL_CONFIG['port'], user=MYSQL_CONFIG['user'], password=MYSQL_CONFIG["passwd"],
+                           database=MYSQL_CONFIG['db'], charset=MYSQL_CONFIG['charset'], host=MYSQL_CONFIG['host'])
+
 @worker_process_shutdown.connect
 def shutdown_worker(**kwargs):
-    global redis_con
-    if redis_con:
-        redis_con.close()
-"""
+    global conn
+    if conn:
+        conn.close()
+
 
 
 @app.task(base=MyTask)
 def save_big_deals(market_code ,data):
     fil = BigDealFilter(redis_con)
+    """
+    mysql_pool = PooledDB(
+        pymysql, MYSQL_CONFIG['min_size'], host=MYSQL_CONFIG['host'],
+        user=MYSQL_CONFIG['user'], passwd=MYSQL_CONFIG['passwd'], db=MYSQL_CONFIG['db'],
+        port=MYSQL_CONFIG['port'], charset=MYSQL_CONFIG['charset']
+    )
+    """
+
     last_big_deal_time = redis_con.hget("LAST_TRADE_TIME",market_code) or 0
     save_data = fil.get_useful_data(data, int(last_big_deal_time))
-    conn = mysql_pool.connection()
-    cur = conn.cursor()
-    sql = """
-    INSERT INTO big_deal (timestamp, symbol, order, type, market_code, side, price, amount, cny_price, usd_price)
-    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    try:
-        cur.executemany(sql,save_data)
-        conn.commit()
-    except:
-        print(traceback.print_exc())
-    finally:
-        cur.close()
-        conn.close()
-
+    # conn = mysql_pool.connection()
+    # conn = pymysql.connect(port=MYSQL_CONFIG['port'],user=MYSQL_CONFIG['user'],password=MYSQL_CONFIG["passwd"], database=MYSQL_CONFIG['db'],charset=MYSQL_CONFIG['charset'],host=MYSQL_CONFIG['host'])
+    if save_data:
+        cur = conn.cursor()
+        sql = "INSERT INTO big_deal (timestamp, symbol, order_id, market_code, side, price, amount, cny_price, usd_price) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        try:
+            cur.executemany(sql,save_data)
+            conn.commit()
+        except:
+            print(traceback.print_exc())

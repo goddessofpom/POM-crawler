@@ -1,61 +1,53 @@
 from core.config import IP_CONFIG
-import random
 import time
-import aiohttp
-import json
+from queue import PriorityQueue
+import asyncio
+
+class ScoreSession(object):
+    def __init__(self, session, score=IP_CONFIG['max_request_per_min']):
+        self.session = session
+        self.score = score
+        self.start_time = time.time()
+
+    def __lt__(self, other):
+        return self.score < other.score
+
+    def get_fetch_session(self):
+        now_time = time.time()
+
+        if self.score <= 0:
+            asyncio.sleep(IP_CONFIG['sleep_per_min'])
+
+        if now_time - self.start_time >= 60:
+            self.score = IP_CONFIG['max_request_per_min']
+            self.start_time = now_time
+
+        self.score = self.score - 1
+        return self.session
 
 
 class BaseController(object):
     def __init__(self):
-        self.enable_ips = IP_CONFIG['ip_list']
-        self.disable_ips = {}
-        self.retry_interval = IP_CONFIG['ip_retry_interval']
+        self.enable_sessions = PriorityQueue()
+        self.disable_sessions = []
 
-    def get_ip(self):
+    def prepare_session(self, sessions):
+        for se in sessions:
+            init_session = ScoreSession(se)
+            self.enable_sessions.put(init_session)
+
+
+    def get_session(self):
         raise NotImplementedError("this method must override")
 
-    def reuse_ip(self):
-        raise NotImplementedError("this method must override")
 
-class BinanceController(BaseController):
-    def __init__(self, market_code, exception_handler):
-        self.exception_handler = exception_handler
-        self.market_code = market_code
-        super(BinanceController, self).__init__()
+class StandardController(BaseController):
+    def __init__(self):
+        super(StandardController, self).__init__()
 
-    def get_ip(self):
-        try:
-            ip = random.choice(self.enable_ips)
-        except IndexError:
-            ip = None
-        return ip
+    def get_session(self):
+        priority_session = self.enable_sessions.get()
+        session = priority_session.get_fetch_session()
+        self.enable_sessions.put(priority_session)
+        return session
 
-    def disable_ip(self, ip, timestamp):
-        try:
-            self.enable_ips.remove(ip)
-        except KeyError:
-            print("this ip dose not exist")
-            return False
-
-        self.disable_ips[ip] = timestamp
-        return True
-
-    def reuse_ip(self):
-        for ip, timestamp in self.disable_ips.items():
-            now_time = time.time()
-            if now_time - timestamp >= self.retry_interval:
-                result = self._test_ip(ip)
-                if result is True:
-                    self.enable_ips.append(ip)
-                    del self.disable_ips[ip]
-                else:
-                    continue
-
-
-    def _test_ip(self, ip):
-        session = aiohttp.ClientSession()
-        url = IP_CONFIG[self.market_code + '_test_url']
-        response = session.get(url)
-        data = json.loads(response.text)
-        is_correct = self.exception_handler.is_correct(market_code=self.market_code, data=data)
-        return is_correct

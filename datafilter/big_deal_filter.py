@@ -20,7 +20,6 @@ class BigDealFilter(object):
         else:
             return False
 
-
     def get_useful_data(self, data, timestamp):
         useful_data = [trade for trade in data if trade["time"] > timestamp]
         big_deal_data = list(filter(self._get_big_deal, useful_data))
@@ -31,7 +30,7 @@ class BigDealFilter(object):
         pr_data = []
         for trade in data:
             trade_value = (
-                trade["timestamp"], trade["symbol"], trade["order_id"], trade["type"],
+                trade["time"], trade["symbol"], trade["order_id"],
                 trade["market_code"], trade["side"], trade["price"], trade["amount"],
                 trade['cny_price'], trade['usd_price']
             )
