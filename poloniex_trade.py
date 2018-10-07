@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     coinpairs = spider.get_coinpairs()
     depth_url = "https://poloniex.com/public?command=returnTradeHistory&currencyPair="
-    url_list = [[depth_url + coinpair.replace("/", "_"), coinpair] for coinpair in coinpairs]
+    url_list = [[depth_url + "_".join(coinpair.split("/")[::-1]), coinpair] for coinpair in coinpairs]
     spider.add_task(url_list)
 
     spider.run()
