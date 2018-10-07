@@ -152,4 +152,4 @@ class BaseSpider(object):
 
     def run(self):
         self.loop.run_until_complete(asyncio.ensure_future(asyncio.wait(self.task_url)))
-        # self.loop.run_forever()
+        self.loop.run_forever()

@@ -1,4 +1,5 @@
 import time
+import asyncio
 
 from core.config import LIMITER_CONFIG
 
@@ -29,3 +30,15 @@ class StandardLimiter(BaseLimiter):
             limit_rate = LIMITER_CONFIG[self.market_code]['rate']['default']
 
         # time.sleep(limit_rate)
+
+class BinanceLimiter(BaseLimiter):
+    def __init__(self, *args, **kwargs):
+        super(BinanceLimiter, self).__init__(*args, **kwargs)
+
+    def limit_per_request(self, symbol, response_time):
+        try:
+            limit_rate = LIMITER_CONFIG[self.market_code]['rate'][symbol]
+        except KeyError:
+            limit_rate = LIMITER_CONFIG[self.market_code]['rate']['default']
+
+        time.sleep(limit_rate)

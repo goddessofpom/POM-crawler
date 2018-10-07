@@ -1,6 +1,6 @@
 from core.factory import AsyncioSpiderFactory
 from component.cleaners import BinanceTradeCleaner
-from component.limiters import StandardLimiter
+from component.limiters import BinanceLimiter
 from component.ip_controllers import StandardController
 from component.exception_handler import BinanceTradeExceptionHandler
 import tracemalloc
@@ -31,7 +31,7 @@ def display_top(snapshot, group_by='lineno', limit=10):
 
 
 if __name__ == "__main__":
-    limiter = StandardLimiter("Binance")
+    limiter = BinanceLimiter("Binance")
     cleaner = BinanceTradeCleaner()
     exception_handler = BinanceTradeExceptionHandler()
     ip_controller = StandardController()
