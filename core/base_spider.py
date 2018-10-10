@@ -31,7 +31,7 @@ class BaseSpider(object):
 
         for ip in IP_CONFIG['ip_list']:
             session = aiohttp.ClientSession(
-                connector=aiohttp.TCPConnector(verify_ssl=False, force_close=True, local_addr=(ip, 0)))
+                connector=aiohttp.TCPConnector(limit_per_host=LIMITER_CONFIG[self.market_code]["max_concurrent"], verify_ssl=False, force_close=True, local_addr=(ip, 0)))
             self.sessions.append(session)
 
         self.ip_controller.prepare_session(self.sessions)
