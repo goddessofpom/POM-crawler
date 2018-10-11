@@ -103,6 +103,7 @@ class BaseSpider(object):
                                 
                     else:
                         self.logger.warning("get wrong data, status:%s" % is_correct)
+                        self.logger.warning(parse_data)
                         self.exception_handler.handle_exception(
                             self.logger, is_correct
                         )
