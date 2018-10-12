@@ -44,7 +44,7 @@ class BaseSpider(object):
         coinpairs = [i["pair_name"] for i in data]
         return coinpairs
 
-    async def _fetch(self, session, url, symbol, timeout=30, ssl=None, headers=None):
+    async def _fetch(self, session, url, symbol, timeout=30, ssl=False, headers=None):
         """
         if self.ip_controller:
             local_addr = self.ip_controller.get_ip()
