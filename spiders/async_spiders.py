@@ -235,7 +235,8 @@ class PoloniexTradeSpider(BaseSpider):
         # self.redis.ltrim(redis_key, 1, 0)
         # self.redis.rpush(redis_key, *data)
         # self.redis.set("LAST_TRADE_TIME", self.market_code, data[-1]["time"])
-        self.redis.hset(redis_key, symbol, data)
+        # self.redis.hset(redis_key, symbol, data)
+        pass
 
     def broadcast_data(self, data):
         # save_big_deals.delay(self.market_code, data)
