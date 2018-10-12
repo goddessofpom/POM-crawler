@@ -27,7 +27,6 @@ class BaseSpider(object):
         ))
         self.logger = get_logger(self.market_code)
         self.sessions = []
-        self.limit = 1000
 
         semaphore = asyncio.Semaphore(self.limiter.get_semaphore_concurrent())
 
@@ -136,7 +135,7 @@ class BaseSpider(object):
             return None
 
     async def add_task(self, tasks, headers=None):
-        '''
+
         for task in tasks:
             session = self.ip_controller.get_session()
             self.task_url.append(self._fetch(session, task[0], task[1], headers=headers))
@@ -145,6 +144,7 @@ class BaseSpider(object):
             for task in tasks:
                 session = self.ip_controller.get_session()
                 await pool.put(self._fetch(session, task[0], task[1], headers=headers))
+        '''
 
 
     def get_redis_key(self,market_code, symbol):
@@ -160,7 +160,7 @@ class BaseSpider(object):
         self.loop.stop()
 
 
-    def run(self, tasks):
-        # self.loop.run_until_complete(asyncio.ensure_future(asyncio.wait(self.task_url)))
-        self.loop.run_until_complete(self.add_task(tasks))
+    def run(self):
+        self.loop.run_until_complete(asyncio.ensure_future(asyncio.wait(self.task_url)))
+        # self.loop.run_until_complete(self.add_task(tasks))
         self.loop.run_forever()

@@ -180,6 +180,7 @@ class PoloniexTradeCleaner(BaseCleaner):
         super(PoloniexTradeCleaner, self).__init__(*args, **kwargs)
 
     def clean_data(self,market_code, symbol, data):
+        '''
         for trade in data:
             trade["side"] = trade.pop("type")
             trade["price"] = trade.pop("rate")
@@ -188,4 +189,5 @@ class PoloniexTradeCleaner(BaseCleaner):
             trade["order_id"] = -1
             trade["time"] = time.mktime(time.strptime(trade.pop("date"), '%Y-%m-%d %H:%M:%S')) * 1000
             trade.pop("total")
+        '''
         return data
