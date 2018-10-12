@@ -134,7 +134,7 @@ class BaseSpider(object):
             # self.loop.stop()
             return None
 
-    async def add_task(self, tasks, headers=None):
+    def add_task(self, tasks, headers=None):
 
         for task in tasks:
             session = self.ip_controller.get_session()
