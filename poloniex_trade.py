@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     coinpairs = spider.get_coinpairs()
     end = int(time.time())
-    start = end - 3600 * 24
+    start = end - 3600
     depth_url = "https://poloniex.com/public?command=returnTradeHistory&start=%s&end=%s&currencyPair=" % (start, end)
     url_list = [[depth_url + "_".join(coinpair.split("/")[::-1]), coinpair] for coinpair in coinpairs]
     spider.add_task(url_list)
