@@ -172,6 +172,8 @@ class PoloniexDepthCleaner(BaseCleaner):
     def clean_data(self,market_code, symbol, data):
         data.pop("isFrozen")
         data.pop("seq")
+        data["asks"] = [[ask[0],str(ask[1])] for ask in data["asks"]]
+        data["bids"] = [[bid[0], str(bid[1])] for bid in data["bids"]]
         return data
 
 
