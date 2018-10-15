@@ -14,6 +14,8 @@ class BinanceDepthCleaner(BaseCleaner):
         super(BinanceDepthCleaner, self).__init__(*args, **kwargs)
 
     def clean_data(self, market_code, symbol, data):
+        data["asks"] = [[ask[0], str(ask[1])] for ask in data["asks"]]
+        data["bids"] = [[bid[0], str(bid[1])] for bid in data["bids"]]
         return data
 
 class BinanceTradeCleaner(BaseCleaner):
