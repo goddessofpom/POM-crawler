@@ -187,10 +187,11 @@ class PoloniexTradeCleaner(BaseCleaner):
         return_data = []
         for trade in data:
             record = [
-                time.mktime(time.strptime(trade.pop("date"), '%Y-%m-%d %H:%M:%S')) * 1000,
+                int(time.mktime(time.strptime(trade.pop("date"), '%Y-%m-%d %H:%M:%S')) * 1000),
                 trade["tradeID"], trade["rate"], trade["amount"], trade["type"]
             ]
             return_data.append(record)
+        return_data.reverse()
             # trade["side"] = trade.pop("type")
             # trade["price"] = trade.pop("rate")
             # trade["market_code"] = market_code
